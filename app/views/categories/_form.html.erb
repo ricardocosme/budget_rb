@@ -1,0 +1,27 @@
+<%= form_with model: [ month, category ] do |form| %>
+  <div>
+    <%= form.label :name %><br>
+    <%= form.text_field :name %>
+    <% category.errors.full_messages_for(:name).each do |message| %>
+      <div style="font-size: 1rem; color: red"><%= message %></div>
+    <% end %>
+    <br>
+    
+    <%= form.label :budget %><br>
+    <%= form.text_field :budget %>
+    <% category.errors.full_messages_for(:budget).each do |message| %>
+      <div style="font-size: 1rem; color: red"><%= message %></div>
+    <% end %>
+    <br>
+
+    <%= form.label :tag %><br>
+    <%= form.text_field :tag %>
+    <% category.errors.full_messages_for(:tag).each do |message| %>
+      <div style="font-size: 1rem; color: red"><%= message %></div>
+    <% end %>
+    <br>
+  </div>
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

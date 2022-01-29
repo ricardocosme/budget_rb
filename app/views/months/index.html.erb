@@ -1,0 +1,14 @@
+<h1>budgets</h1>
+<%= link_to "new budget", new_month_path %>
+
+<ul>
+  <% @months.each do |month| %>
+    <li>
+      <%= link_to month.name, month_path(month) %>
+      <%= link_to "edit", edit_month_path(month) %>
+      <%= link_to "delete", month_path(month),
+       data: { turbo_method: :delete, } %>
+    </li>
+  <% end %>
+</ul>
+

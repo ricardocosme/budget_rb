@@ -1,0 +1,6 @@
+<div>
+  <h1 style="margin-bottom: 15px">new expense</h1>
+  <h4 style="margin-top: 0">for <%= @category.name  %></h4>
+</div>
+
+<%= render "form", month: @month, category: @category, expense: @expense %>

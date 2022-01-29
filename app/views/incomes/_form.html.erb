@@ -1,0 +1,20 @@
+<%= form_with model: [ month, income ] do |form| %>
+  <div>
+    <%= form.label :name %><br>
+    <%= form.text_field :name %>
+    <% income.errors.full_messages_for(:name).each do |message| %>
+      <div style="font-size: 1rem; color: red"><%= message %></div>
+    <% end %>
+    <br>
+    
+    <%= form.label :amount %><br>
+    <%= form.text_field :amount %>
+    <% income.errors.full_messages_for(:amount).each do |message| %>
+      <div style="font-size: 1rem; color: red"><%= message %></div>
+    <% end %>
+    <br>
+  </div>
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,13 @@
+<%= form_with model: [ month, category, expense ] do |form| %>
+  <div>
+    <%= form.label :amount %><br>
+    <%= form.text_field :amount %>
+    <% expense.errors.full_messages_for(:amount).each do |message| %>
+      <div style="font-size: 1rem; color: red"><%= message %></div>
+    <% end %>
+    <br>
+  </div>
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

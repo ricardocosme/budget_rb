@@ -1,0 +1,163 @@
+<h3 style="margin-bottom: 0"><%= @month.name %></h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Amount</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%
+    # I want an array to avoid unnecessary SQL queries
+    # like the one to obtain the sum of all incomes.
+    incomes = @month.incomes.to_a
+    incomes.each do |income| %>
+      <tr>
+        <td><%= income.name %></td>
+        <td><%= income.amount.to_formatted_s(:currency) %></td>
+        <td>
+          <%= link_to "edit", edit_month_income_path(@month, income) %>
+          <%= link_to "delete", [income.month, income],
+           data: { turbo_method: :delete } %>
+        </td>
+      </tr>
+    <%
+    end
+    total_income = incomes.map{ |income| income.amount }.sum
+    %>
+    <tr>
+      <th>Income</th>
+      <th><b><%= total_income.to_formatted_s(:currency) %></b></th>
+      <th></th>
+    </tr>
+  </tbody>
+</table>
+<%= link_to "new income", new_month_income_path(@month) %>
+
+<%
+total_budget = total_account = 0
+
+# I want an array to avoid unnecessary SQL queries.
+categories = @month.categories.to_a
+
+# This is an optimization to avoid one SQL select for each tag,
+# so instead of something like 'category.expenses.sum(:amount)'
+# all expenses are passed to an array
+all_expenses = Expense.all.to_a
+
+# Hash with unique tags as keys. The value is a storage
+# to the budget associated with the tag.
+tags = categories
+  .map {|category| category.tag}
+  .uniq
+  .to_h {|tag| [tag, 0]}
+
+tags.each_key do |tag|
+  categories_of_tag = categories.select{ |category| category.tag == tag }
+%>
+<table>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Budget</th>
+      <th>Account</th>
+      <th>Diff</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>            
+    <%
+    # I want to take advantage of each iteration to accumulate the values
+    # that I need to show in the table.
+    acc_budget = acc_account = acc_diff = 0
+    
+    categories_of_tag.each do |category|
+        acc_budget += budget = category.budget
+        
+        # Optimization for 'category.expenses.sum(:amount)'
+        acc_account += account = all_expenses
+        .select{|expense| expense.category_id == category.id}
+        .map{|expense| expense.amount}
+        .sum
+        
+        acc_diff += diff = budget - account
+    %>
+    <tr>
+      <td>
+        <%= link_to category.name,
+         new_month_category_expense_path(@month, category.id) %>
+      </td>
+      <td><%= budget.to_formatted_s(:currency) %></td>
+      <td><%= account.to_formatted_s(:currency) %></td>
+      <td><%= diff.to_formatted_s(:currency) %></td>
+      <td>
+        <%= link_to "edit", edit_month_category_path(@month, category) %>
+        <%= link_to "delete", [category.month, category],
+         data: { turbo_method: :delete } %>
+      </td>
+    </tr>
+    <% end
+    # I want to store the budget of each tag to do some calculations in the end.
+    tags[tag] = acc_budget
+        
+    total_budget += acc_budget
+    total_account += acc_account
+    %>
+    <tr>
+      <td><b><%= tag %></b></td>
+      <td><b><%= acc_budget.to_formatted_s(:currency) %></b></td>
+      <td><b><%= acc_account.to_formatted_s(:currency) %></b></td>
+      <td><b><%= acc_diff.to_formatted_s(:currency) %></b></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+<% end %>
+
+<%= link_to "new category", new_month_category_path(@month) %>
+
+<!-- TODO: shortcut to new expense choosing the category
+     from a dropdown menu. After the successful operation
+     the user is redirect to the same page to allow the
+     registration of another expense. -->
+<%#= link_to "new expense", new_month_category_expense_path(@month) %>
+
+<h3 style="margin-bottom: 0">Balance</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Balance</th>
+      <th>Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Budget</td>
+      <td><%= (total_income - total_budget).to_formatted_s(:currency) %></td>
+    </tr>
+    <tr>
+      <td>Amount</td>
+      <td><%= (total_income - total_account).to_formatted_s(:currency) %></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 style="margin-bottom: 0">budget/income %</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Budget</th>
+      <th>budget/income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% tags.each do |tag, budget| %>
+      <tr>
+        <td><%= tag %></td>
+        <td><%= (budget / total_income * 100).to_formatted_s(:percentage, precision: 2) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
