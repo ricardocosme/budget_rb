@@ -1,12 +1,4 @@
 class IncomesController < ApplicationController
-  def index
-    @incomes = Income.all
-  end
-  
-  def show
-    @income = Income.find(params[:id])
-  end
-  
   def new
     @month = Month.find(params[:month_id])
     @income = Income.new()
@@ -44,7 +36,7 @@ class IncomesController < ApplicationController
     @income = @month.incomes.find(params[:id])
     @income.destroy
 
-    redirect_to month_path(@month), status: 303
+    redirect_to @month, status: 303
   end
   
   private

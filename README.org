@@ -11,7 +11,8 @@ This is my first program using [[https://www.ruby-lang.org/en/][Ruby]] [[https:/
   rails s
 #+END_SRC
 
-** Requirements
+** Requirements and dependencies
 1. Ruby v3
 2. Rails v7
 3. SQLlite v3
+4. [[https://simplecss.org/][Simple CSS]]

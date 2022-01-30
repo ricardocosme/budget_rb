@@ -1,4 +1,4 @@
-<h3 style="margin-bottom: 0"><%= @month.name %></h3>
+<h3 style="margin-bottom: 0">budget <%= @month.name %></h3>
 
 <table>
   <thead>
@@ -13,13 +13,14 @@
     # I want an array to avoid unnecessary SQL queries
     # like the one to obtain the sum of all incomes.
     incomes = @month.incomes.to_a
+    
     incomes.each do |income| %>
       <tr>
         <td><%= income.name %></td>
         <td><%= income.amount.to_formatted_s(:currency) %></td>
         <td>
           <%= link_to "edit", edit_month_income_path(@month, income) %>
-          <%= link_to "delete", [income.month, income],
+          <%= link_to "delete", [@month, income],
            data: { turbo_method: :delete } %>
         </td>
       </tr>
@@ -37,6 +38,9 @@
 <%= link_to "new income", new_month_income_path(@month) %>
 
 <%
+# I want to take advantatge of each iteration through
+# all categories to calculate the total budget and
+# account in order to do some calculations in the end.
 total_budget = total_account = 0
 
 # I want an array to avoid unnecessary SQL queries.
@@ -44,7 +48,8 @@ categories = @month.categories.to_a
 
 # This is an optimization to avoid one SQL select for each tag,
 # so instead of something like 'category.expenses.sum(:amount)'
-# all expenses are passed to an array
+# all expenses are passed to an array and filter after that
+# to achieve the same information.
 all_expenses = Expense.all.to_a
 
 # Hash with unique tags as keys. The value is a storage
@@ -100,9 +105,8 @@ tags.each_key do |tag|
     </tr>
     <% end
     # I want to store the budget of each tag to do some calculations in the end.
-    tags[tag] = acc_budget
+    total_budget += tags[tag] = acc_budget
         
-    total_budget += acc_budget
     total_account += acc_account
     %>
     <tr>
@@ -156,7 +160,10 @@ tags.each_key do |tag|
     <% tags.each do |tag, budget| %>
       <tr>
         <td><%= tag %></td>
-        <td><%= (budget / total_income * 100).to_formatted_s(:percentage, precision: 2) %></td>
+        <td><%=
+            (budget / total_income * 100)
+            .to_formatted_s(:percentage, precision: 2) %>
+        </td>
       </tr>
     <% end %>
   </tbody>
