@@ -2,7 +2,7 @@
 This is my first program using [[https://www.ruby-lang.org/en/][Ruby]] [[https://rubyonrails.org/][on Rails]] and it's a version of [[https://github.com/ricardocosme/budget_py][budget_py]].
 
 ** Screenshot
-file:screenshot_example.png
+[[file:screenshot/example.png]]
 
 ** Requirements
 1. Ruby v3
