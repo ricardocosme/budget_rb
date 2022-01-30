@@ -4,6 +4,13 @@ This is my first program using [[https://www.ruby-lang.org/en/][Ruby]] [[https:/
 ** Screenshot
 [[file:screenshot/example.png]]
 
+** Deployment
+#+BEGIN_SRC shell
+  cd budget_rb
+  rails db:migrate
+  rails s
+#+END_SRC
+
 ** Requirements
 1. Ruby v3
 2. Rails v7
