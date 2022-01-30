@@ -1,9 +1,9 @@
 <%= form_with model: month do |form| %>
   <div>
     <%= form.label :name %><br>
-    <%= form.text_field :name %><br>
+    <%= form.text_field :name %>
     <% month.errors.full_messages_for(:name).each do |message| %>
-      <div><%= message %></div>
+      <div style="font-size: 1rem; color: red"><%= message %></div>
     <% end %>
   </div>
   <div>
